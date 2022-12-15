@@ -1,0 +1,27 @@
+<IfModule mod_deflate.c>
+SetOutputFilter DEFLATE
+# Don’t compress
+SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+SetEnvIfNoCase Request_URI \.(?:exe|t?gz|zip|bz2|sit|rar)$ no-gzip dont-vary
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(ico|jpe?g|png|gif|swf|css|gz|js|webp|ttf)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "max-age=7200, public"
+    </FilesMatch>
+</IfModule>
+
+ExpiresActive On
+ExpiresDefault "modification plus 1 day"
+<Files index.html>
+Header append Cache-Control "public, must-revalidate"
+</Files>
+
+FileETag INode MTime Size
+
+RewriteEngine on
+RewriteCond %{HTTPS} !=on
+RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
